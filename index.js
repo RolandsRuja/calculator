@@ -6,6 +6,7 @@ const SYMBOL_SUBTRACT = "SUBTRACT";
 const SYMBOL_ADD = "ADD";
 const SYMBOL_COMMA = "COMMA";
 const SYMBOL_EVALUATE = "EVALUATE";
+const SYMBOL_MULTIPLY = "MULTIPLY";
 
 const MAX_DISPLAY_INPUT_LENGTH = 10;
 
@@ -17,6 +18,7 @@ const KEYBOARD_KEY_SYMBOL_MAP = {
   "+": SYMBOL_ADD,
   ",": SYMBOL_COMMA,
   "=": SYMBOL_EVALUATE,
+  "*": SYMBOL_MULTIPLY,
 };
 
 let previousNumber = null;
@@ -24,10 +26,15 @@ let activeAction = null;
 
 const canAddComma = (displayValue) => displayValue.split(",").length === 1;
 
-const toggleActive = () => {
+const removeActive = () => {
   document
-    .getElementById(`${activeAction.toLowerCase()}-btn`)
-    .classList.toggle("active");
+    .querySelectorAll(".active")
+    .forEach((element) => element.classList.remove("active"));
+};
+
+const addActive = (symbol) => {
+  removeActive();
+  document.getElementById(`${symbol.toLowerCase()}`).classList.add("active");
 };
 
 const handleNumberInput = (number, display) => {
@@ -43,6 +50,14 @@ const handleNumberInput = (number, display) => {
   display.textContent = `${display.textContent}${number}`;
 };
 
+const handleBasicExpression = (symbol) => {
+  addActive(symbol);
+};
+
+const handleEvaluate = () => {
+  removeActive();
+};
+
 const handleCommaInput = (display) => {
   if (!canAddComma(display.textContent)) {
     return;
@@ -55,22 +70,23 @@ const handleInvert = (display) => {
   display.textContent = Number(display.textContent * -1);
 };
 
-const handleAddition = (display) => {
-  activeAction = SYMBOL_ADD;
-  previousNumber = Number(display.textContent);
-  toggleActive();
-};
-
 const handleDelete = (display) => {
   display.textContent = "0";
+  removeActive();
 };
 
 const handleInput = (symbol) => {
   const display = document.getElementById("display");
 
   switch (symbol) {
+    case SYMBOL_DIVIDE:
     case SYMBOL_ADD:
-      handleAddition(display);
+    case SYMBOL_SUBTRACT:
+    case SYMBOL_MULTIPLY:
+      handleBasicExpression(symbol);
+      break;
+    case SYMBOL_EVALUATE:
+      handleEvaluate();
       break;
     case SYMBOL_COMMA:
       handleCommaInput(display);
@@ -85,7 +101,7 @@ const handleInput = (symbol) => {
       handleNumberInput(symbol, display);
   }
 
-  document.getElementById("delete-btn").textContent =
+  document.getElementById("delete").textContent =
     display.textContent.length > 1 || display.textContent !== "0" ? "C" : "AC";
 };
 
