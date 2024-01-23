@@ -9,6 +9,16 @@ const SYMBOL_EVALUATE = "EVALUATE";
 
 const MAX_DISPLAY_INPUT_LENGTH = 10;
 
+const KEYBOARD_KEY_SYMBOL_MAP = {
+  Delete: SYMBOL_DELETE,
+  "%": SYMBOL_PERCENTAGE,
+  "/": SYMBOL_DIVIDE,
+  "-": SYMBOL_SUBTRACT,
+  "+": SYMBOL_ADD,
+  ",": SYMBOL_COMMA,
+  "=": SYMBOL_EVALUATE,
+};
+
 let previousNumber = null;
 let activeAction = null;
 
@@ -83,4 +93,15 @@ document.querySelectorAll(".button").forEach((button) => {
   button.addEventListener("click", (event) =>
     handleInput(event.target.dataset.value)
   );
+});
+
+window.addEventListener("keypress", (event) => {
+  if (Object.keys(KEYBOARD_KEY_SYMBOL_MAP).includes(event.key)) {
+    handleInput(KEYBOARD_KEY_SYMBOL_MAP[event.key]);
+    return;
+  }
+
+  if (!isNaN(+event.key)) {
+    handleInput(event.key);
+  }
 });
