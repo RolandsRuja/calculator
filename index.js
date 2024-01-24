@@ -112,6 +112,17 @@ const handleInvert = (display) => {
   display.textContent = Number(display.textContent * -1);
 };
 
+const handlePercentage = (display) => {
+  if (
+    display.textContent === "0 " ||
+    display.textContent.length + 2 > MAX_DISPLAY_INPUT_LENGTH
+  ) {
+    return;
+  }
+
+  display.textContent = Number(display.textContent) / 100;
+};
+
 const handleDelete = (display) => {
   display.textContent = "0";
   activeAction = null;
@@ -141,6 +152,9 @@ const handleInput = (symbol) => {
       break;
     case SYMBOL_DELETE:
       handleDelete(display);
+      break;
+    case SYMBOL_PERCENTAGE:
+      handlePercentage(display);
       break;
     default:
       handleNumberInput(symbol, display);
