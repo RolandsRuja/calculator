@@ -23,17 +23,18 @@ const KEYBOARD_KEY_SYMBOL_MAP = {
 
 let previousNumber = null;
 let activeAction = null;
+let result = null;
 
 const canAddComma = (displayValue) => displayValue.split(",").length === 1;
 
-const removeActive = () => {
+const removeActiveClass = () => {
   document
     .querySelectorAll(".active")
     .forEach((element) => element.classList.remove("active"));
 };
 
-const addActive = (symbol) => {
-  removeActive();
+const addActiveClass = (symbol) => {
+  removeActiveClass();
   document.getElementById(`${symbol.toLowerCase()}`).classList.add("active");
 };
 
@@ -42,7 +43,13 @@ const handleNumberInput = (number, display) => {
     return;
   }
 
-  if (display.textContent === "0") {
+  if (display.textContent === "0" || display.textContent === "Error") {
+    display.textContent = number;
+    return;
+  }
+
+  if (previousNumber === null && activeAction !== null) {
+    previousNumber = display.textContent;
     display.textContent = number;
     return;
   }
@@ -50,12 +57,47 @@ const handleNumberInput = (number, display) => {
   display.textContent = `${display.textContent}${number}`;
 };
 
-const handleBasicExpression = (symbol) => {
-  addActive(symbol);
+const handleBasicExpression = (symbol, display) => {
+  if (symbol === activeAction) {
+    return;
+  }
+
+  activeAction = symbol;
+  addActiveClass(symbol);
 };
 
-const handleEvaluate = () => {
-  removeActive();
+const handleEvaluate = (display) => {
+  removeActiveClass();
+
+  let eval = null;
+  switch (activeAction) {
+    case SYMBOL_ADD:
+      eval = (Number(display.textContent) + Number(previousNumber)).toString();
+      break;
+    case SYMBOL_DIVIDE:
+      if (display.textContent === "0") {
+        display.textContent = "Error";
+        return;
+      }
+      eval = (Number(previousNumber) / Number(display.textContent)).toString();
+      break;
+    case SYMBOL_SUBTRACT:
+      eval = (Number(previousNumber) - Number(display.textContent)).toString();
+      break;
+    case SYMBOL_MULTIPLY:
+      eval = (Number(display.textContent) * Number(previousNumber)).toString();
+      break;
+    default:
+      display.textContent = "ERROR";
+      return;
+  }
+
+  if (eval.length > MAX_DISPLAY_INPUT_LENGTH) {
+    eval = eval.slice(0, MAX_DISPLAY_INPUT_LENGTH - 1);
+  }
+
+  display.textContent = eval;
+  result = eval;
 };
 
 const handleCommaInput = (display) => {
@@ -72,7 +114,10 @@ const handleInvert = (display) => {
 
 const handleDelete = (display) => {
   display.textContent = "0";
-  removeActive();
+  activeAction = null;
+  result = null;
+  previousNumber = null;
+  removeActiveClass();
 };
 
 const handleInput = (symbol) => {
@@ -83,10 +128,10 @@ const handleInput = (symbol) => {
     case SYMBOL_ADD:
     case SYMBOL_SUBTRACT:
     case SYMBOL_MULTIPLY:
-      handleBasicExpression(symbol);
+      handleBasicExpression(symbol, display);
       break;
     case SYMBOL_EVALUATE:
-      handleEvaluate();
+      handleEvaluate(display);
       break;
     case SYMBOL_COMMA:
       handleCommaInput(display);
