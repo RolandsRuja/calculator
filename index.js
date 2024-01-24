@@ -55,7 +55,7 @@ const handleNumberInput = (number, display) => {
   }
 
   if (previousNumber === null && activeAction !== null) {
-    previousNumber = Number(display.textContent);
+    previousNumber = display.textContent === "0," ? 0 : display.textContent;
     display.textContent = number;
     return;
   }
@@ -78,10 +78,6 @@ const handleEvaluate = (display) => {
   let eval = null;
   switch (activeAction) {
     case SYMBOL_ADD:
-      console.log({
-        displayValue: display.textContent,
-        previousNumber,
-      });
       eval = (Number(display.textContent) + Number(previousNumber)).toString();
       break;
     case SYMBOL_DIVIDE:
