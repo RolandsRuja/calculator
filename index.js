@@ -25,6 +25,12 @@ let previousNumber = null;
 let activeAction = null;
 let result = null;
 
+const resetValues = () => {
+  result = null;
+  previousNumber = null;
+  activeAction = null;
+};
+
 const canAddComma = (displayValue) => displayValue.split(",").length === 1;
 
 const removeActiveClass = () => {
@@ -49,7 +55,7 @@ const handleNumberInput = (number, display) => {
   }
 
   if (previousNumber === null && activeAction !== null) {
-    previousNumber = display.textContent;
+    previousNumber = Number(display.textContent);
     display.textContent = number;
     return;
   }
@@ -72,11 +78,16 @@ const handleEvaluate = (display) => {
   let eval = null;
   switch (activeAction) {
     case SYMBOL_ADD:
+      console.log({
+        displayValue: display.textContent,
+        previousNumber,
+      });
       eval = (Number(display.textContent) + Number(previousNumber)).toString();
       break;
     case SYMBOL_DIVIDE:
       if (display.textContent === "0") {
         display.textContent = "Error";
+        resetValues();
         return;
       }
       eval = (Number(previousNumber) / Number(display.textContent)).toString();
@@ -88,7 +99,6 @@ const handleEvaluate = (display) => {
       eval = (Number(display.textContent) * Number(previousNumber)).toString();
       break;
     default:
-      display.textContent = "ERROR";
       return;
   }
 
@@ -98,6 +108,8 @@ const handleEvaluate = (display) => {
 
   display.textContent = eval;
   result = eval;
+  activeAction = null;
+  previousNumber = null;
 };
 
 const handleCommaInput = (display) => {
@@ -124,11 +136,24 @@ const handlePercentage = (display) => {
 };
 
 const handleDelete = (display) => {
-  display.textContent = "0";
-  activeAction = null;
-  result = null;
-  previousNumber = null;
-  removeActiveClass();
+  if (previousNumber === null && activeAction === null) {
+    display.textContent = "0";
+    resetValues();
+    removeActiveClass();
+  }
+
+  if (activeAction !== null && previousNumber === null) {
+    removeActiveClass();
+    activeAction = null;
+  }
+
+  if (previousNumber !== null && activeAction === null) {
+    display.textContent = "0";
+  }
+
+  if (previousNumber !== null && activeAction !== null) {
+    display.textContent = "0";
+  }
 };
 
 const handleInput = (symbol) => {
