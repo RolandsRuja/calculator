@@ -63,7 +63,7 @@ const handleNumberInput = (number, display) => {
   display.textContent = `${display.textContent}${number}`;
 };
 
-const handleBasicExpression = (symbol, display) => {
+const handleBasicExpression = (symbol) => {
   if (symbol === activeAction) {
     return;
   }
